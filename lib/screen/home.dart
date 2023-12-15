@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:todo/const/colors.dart';
 import 'package:todo/screen/add_note_screen.dart';
@@ -20,6 +22,15 @@ class _Home_ScreenState extends State<Home_Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("ListEaze",style: TextStyle(color: Colors.black54),),
+        backgroundColor: custom_green,
+        actions: [
+          IconButton(onPressed: ()async{
+             await FirebaseAuth.instance.signOut();
+          }, icon: Icon(Icons.exit_to_app))
+        ],
+      ),
       backgroundColor: backgroundColors,
       floatingActionButton: Visibility(
         visible: show,
@@ -37,6 +48,7 @@ class _Home_ScreenState extends State<Home_Screen> {
         child: NotificationListener<UserScrollNotification>(
           onNotification: (notification) {
             if (notification.direction == ScrollDirection.forward) {
+             
               setState(() {
                 show = true;
               });

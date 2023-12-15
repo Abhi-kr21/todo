@@ -18,6 +18,7 @@ class _LogIN_ScreenState extends State<LogIN_Screen> {
 
   final email = TextEditingController();
   final password = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -38,19 +39,35 @@ class _LogIN_ScreenState extends State<LogIN_Screen> {
       backgroundColor: backgroundColors,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 20),
-              image(),
-              SizedBox(height: 50),
-              textfield(email, _focusNode1, 'Email', Icons.email),
-              SizedBox(height: 10),
-              textfield(password, _focusNode2, 'Password', Icons.password),
-              SizedBox(height: 8),
-              account(),
-              SizedBox(height: 20),
-              Login_bottom(),
-            ],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                SizedBox(height: 20),
+                image(),
+                SizedBox(height: 50),
+                textfield(email, _focusNode1, 'Email', Icons.email,(value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email is required';
+                    } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$')
+                        .hasMatch(value)) {
+                      return 'Invalid email address';
+                    }
+                    return null;
+                  }),
+                SizedBox(height: 10),
+                textfield(password, _focusNode2, 'Password', Icons.password, (value) {
+                        if (value!.isEmpty) {
+                          return "Password cannot be empty";
+                        }
+                        return null;
+                      },),
+                SizedBox(height: 8),
+                account(),
+                SizedBox(height: 20),
+                Login_bottom(),
+              ],
+            ),
           ),
         ),
       ),
@@ -87,8 +104,12 @@ class _LogIN_ScreenState extends State<LogIN_Screen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: GestureDetector(
-        onTap: () {
-          AuthenticationRemote().login(email.text, password.text);
+        onTap: () async{
+          if(_formKey.currentState!.validate()){
+             AuthenticationRemote().login(email.text, password.text);
+          }
+    
+         
         },
         child: Container(
           alignment: Alignment.center,
@@ -112,7 +133,7 @@ class _LogIN_ScreenState extends State<LogIN_Screen> {
   }
 
   Widget textfield(TextEditingController _controller, FocusNode _focusNode,
-      String typeName, IconData iconss) {
+      String typeName, IconData iconss,String? Function(String?)? validator) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
@@ -120,9 +141,10 @@ class _LogIN_ScreenState extends State<LogIN_Screen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
         ),
-        child: TextField(
+        child: TextFormField(
           controller: _controller,
           focusNode: _focusNode,
+          validator: validator,
           style: TextStyle(fontSize: 18, color: Colors.black),
           decoration: InputDecoration(
               prefixIcon: Icon(

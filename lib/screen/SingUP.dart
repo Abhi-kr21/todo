@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:todo/const/colors.dart';
 import 'package:todo/data/auth_data.dart';
 
-
 class SignUp_Screen extends StatefulWidget {
   final VoidCallback show;
   SignUp_Screen(this.show, {super.key});
@@ -19,6 +18,7 @@ class _SignUp_ScreenState extends State<SignUp_Screen> {
   final email = TextEditingController();
   final password = TextEditingController();
   final PasswordConfirm = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -41,22 +41,46 @@ class _SignUp_ScreenState extends State<SignUp_Screen> {
       backgroundColor: backgroundColors,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 20),
-              image(),
-              SizedBox(height: 50),
-              textfield(email, _focusNode1, 'Email', Icons.email),
-              SizedBox(height: 10),
-              textfield(password, _focusNode2, 'Password', Icons.password),
-              SizedBox(height: 10),
-              textfield(PasswordConfirm, _focusNode3, 'PasswordConfirm',
-                  Icons.password),
-              SizedBox(height: 8),
-              account(),
-              SizedBox(height: 20),
-              SignUP_bottom(),
-            ],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                SizedBox(height: 20),
+                image(),
+                SizedBox(height: 50),
+                textfield(email, _focusNode1, 'Email', Icons.email, (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Email is required';
+                  } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$')
+                      .hasMatch(value)) {
+                    return 'Invalid email address';
+                  }
+                  return null;
+                }),
+                SizedBox(height: 10),
+                textfield(password, _focusNode2, 'Password', Icons.password,
+                    (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Password is required';
+                  } else if (value.length < 6) {
+                    return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                }),
+                SizedBox(height: 10),
+                textfield(PasswordConfirm, _focusNode3, 'PasswordConfirm',
+                    Icons.password, (value) {
+                  if (value != password.text) {
+                    return 'Passwords do not match';
+                  }
+                  return null;
+                }),
+                SizedBox(height: 8),
+                account(),
+                SizedBox(height: 20),
+                SignUP_bottom(),
+              ],
+            ),
           ),
         ),
       ),
@@ -94,8 +118,10 @@ class _SignUp_ScreenState extends State<SignUp_Screen> {
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: GestureDetector(
         onTap: () {
-           AuthenticationRemote()
-              .register(email.text, password.text, PasswordConfirm.text);
+          if (_formKey.currentState!.validate()) {
+            AuthenticationRemote()
+                .register(email.text, password.text, PasswordConfirm.text);
+          }
         },
         child: Container(
           alignment: Alignment.center,
@@ -119,7 +145,7 @@ class _SignUp_ScreenState extends State<SignUp_Screen> {
   }
 
   Widget textfield(TextEditingController _controller, FocusNode _focusNode,
-      String typeName, IconData iconss) {
+      String typeName, IconData iconss, String? Function(String?)? validator) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
@@ -127,7 +153,8 @@ class _SignUp_ScreenState extends State<SignUp_Screen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
         ),
-        child: TextField(
+        child: TextFormField(
+          validator: validator,
           controller: _controller,
           focusNode: _focusNode,
           style: TextStyle(fontSize: 18, color: Colors.black),

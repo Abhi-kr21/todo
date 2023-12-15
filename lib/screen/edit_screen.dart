@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:todo/const/colors.dart';
 import 'package:todo/data/firestor.dart';
 import 'package:todo/model/notes_model.dart';
@@ -60,9 +61,18 @@ class _Edit_ScreenState extends State<Edit_Screen> {
           onPressed: () {
             Firestore_Datasource().Update_Note(
                 widget._note.id, indexx, title!.text, subtitle!.text);
+                Fluttertoast.showToast(msg: "Task Edited",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+        textColor: Colors.white,
+            fontSize: 16.0
+            );
             Navigator.pop(context);
+            
           },
-          child: Text('add task'),
+          child: Text('Save'),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(

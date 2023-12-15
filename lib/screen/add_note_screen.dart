@@ -1,5 +1,6 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:todo/const/colors.dart';
 import 'package:todo/data/firestor.dart';
 
@@ -50,6 +51,14 @@ class _Add_creenState extends State<Add_creen> {
           ),
           onPressed: () {
             Firestore_Datasource().AddNote(subtitle.text, title.text, indexx);
+                 Fluttertoast.showToast(msg: "Task Added",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+        textColor: Colors.white,
+            fontSize: 16.0
+            );
             Navigator.pop(context);
           },
           child: Text('add task'),
